@@ -16,7 +16,7 @@ TruthLens is a **misinformation detection web application** that classifies text
 ---
 
 ## Project Structure
-
+```
 TruthLens/
 │
 ├── backend/ # Flask backend
@@ -35,6 +35,7 @@ TruthLens/
 │ └── tokenizer.pkl
 │
 └── .gitignore
+```
 ## Installation
 
 ### Prerequisites
@@ -91,7 +92,7 @@ npm start
      b. Confidence percentage
      c. Word-level explanation (LIME)
 
-
+```
 
 | Endpoint                 | Method | Description                  |                         
 |   /                      | GET    | Home page                    |
@@ -103,7 +104,7 @@ npm start
 |  /health                 | GET    | Backend health check         |
 |  /model-debug            | GET    | Test model on sample texts   |
 
-
+```
 
 
 Acknowledgements
