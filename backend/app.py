@@ -27,7 +27,7 @@ base_dir = os.path.abspath(os.path.dirname(__file__))
 app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{os.path.join(base_dir, "users.db")}'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-print(f"📁 Database will be created at: {os.path.join(base_dir, 'users.db')}")
+print(f" Database will be created at: {os.path.join(base_dir, 'users.db')}")
 
 # Initialize SQLAlchemy
 db = SQLAlchemy(app)
@@ -45,9 +45,9 @@ def init_database():
     try:
         with app.app_context():
             db.create_all()
-            print("✅ Database tables created successfully!")
+            print(" Database tables created successfully!")
             test_user = User.query.first()
-            print("✅ Database connection test passed!")
+            print(" Database connection test passed!")
     except Exception as e:
         print(f" Database initialization error: {e}")
         try:
@@ -69,9 +69,9 @@ try:
     model = tf.keras.models.load_model(MODEL_PATH)
     with open(TOKENIZER_PATH, "rb") as f:
         tokenizer = pickle.load(f)
-    print("✅ LSTM model and tokenizer loaded successfully!")
+    print("LSTM model and tokenizer loaded successfully!")
 except Exception as e:
-    print("❌ Error loading model/tokenizer:", e)
+    print(" Error loading model/tokenizer:", e)
     model = None
     tokenizer = None
 
@@ -375,7 +375,7 @@ def register():
             db.session.add(new_user)
             db.session.commit()
         
-        print(f"✅ User registered successfully: {username}")
+        print(f" User registered successfully: {username}")
         return jsonify({"success": True, "message": "User registered successfully! Please login."})
 
     except Exception as e:
@@ -468,17 +468,23 @@ def predict():
         padded_seq = pad_sequences(sequences, maxlen=MAX_SEQUENCE_LENGTH, padding='post', truncating='post')
         real_probability = float(model.predict(padded_seq, verbose=0)[0][0])
 
-        confidence_threshold = 0.30
-        
-        if real_probability >= confidence_threshold:
-            prediction_label = "real"
-            confidence_percent = round(real_probability * 100, 2)
-        elif real_probability <= (1 - confidence_threshold):
-            prediction_label = "fake"
-            confidence_percent = round((1 - real_probability) * 100, 2)
+        confidence_threshold = 0.30  
+
+        upper = 0.5 + confidence_threshold / 2  
+        lower = 0.5 - confidence_threshold / 2  
+
+        if real_probability >= upper:
+           prediction_label = "real"
+           confidence_percent = round(real_probability * 100, 2)
+
+        elif real_probability <= lower:
+           prediction_label = "fake"
+           confidence_percent = round((1 - real_probability) * 100, 2)
+
         else:
-            prediction_label = "uncertain"
-            confidence_percent = 50.0
+           prediction_label = "uncertain"
+           confidence_percent = 50.0
+ 
 
         # Create response data
         response_data = {
@@ -489,7 +495,7 @@ def predict():
             "words_analyzed": len(sequences[0])
         }
         
-        # ⭐ DEBUG LOGGING - See what we're sending
+        #  DEBUG LOGGING - See what we're sending
         print(f"\n SENDING TO FRONTEND:")
         print(f"   Prediction: {prediction_label}")
         print(f"   Confidence: {confidence_percent}%")
@@ -540,7 +546,7 @@ def explain_prediction():
             predictor.predict_proba,
             num_features=15,
             top_labels=1,
-            num_samples=800  #  REDUCED from 600 to 500 for faster processing
+            num_samples=800 
         )
         
         # Scale up contributions for better visibility
@@ -643,10 +649,10 @@ def model_debug():
             padded_seq = pad_sequences(sequences, maxlen=MAX_SEQUENCE_LENGTH)
             prob = float(model.predict(padded_seq, verbose=0)[0][0])
             
-            if prob >= 0.30:
+            if prob >= 0.5 + 0.3 / 2 :
                 prediction = "real"
                 confidence = round(prob * 100, 2)
-            elif prob <= 0.70:
+            elif prob <= 0.5 - 0.3 / 2 :
                 prediction = "fake"
                 confidence = round((1 - prob) * 100, 2)
             else:
