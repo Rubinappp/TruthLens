@@ -19,7 +19,7 @@ backend/venv/
 backend/__pycache__/
 backend/*.pyc
 
-# Databases (if you don't want to upload them)
+# Databases 
 backend/users.db
 
 # ------------------------
